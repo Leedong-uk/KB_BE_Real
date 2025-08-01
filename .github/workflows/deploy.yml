@@ -1,9 +1,9 @@
 name: Deploy To Ec2 (Spring MVC WAR)
 
 on:
-  pull_request:
+  push:
     branches:
-      - main
+      - CI/CD
 
 jobs:
   Deploy:
