@@ -67,6 +67,24 @@ public class GaScoreService {
         return responseDTO;
     }
 
+    public GaScoreDTO getGaScore(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        String accessToken = tokenUtils.extractAccessToken(bearerToken);
+
+        String userId = jwtProcessor.getUsername(accessToken);
+        int userIdx = userMapper.findUserIdxByUserId(userId);
+
+        GaScoreDTO dto = gaScoreMapper.findGaScoreByUserIdx(userIdx);
+
+        if (dto != null) {
+            log.info("사용자 {} 청약 가점 조회 완료: totalScore={}", userIdx, dto.getTotalGaScore());
+        } else {
+            log.warn("사용자 {} 청약 가점 조회 실패 - 데이터 없음", userIdx);
+        }
+
+        return dto;
+    }
+
 
     // AccountMapper 활용해서 계좌 개설일 조회
     private int calculatePaymentPeriod(int userIdx) {

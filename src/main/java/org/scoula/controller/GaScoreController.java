@@ -35,4 +35,23 @@ public class GaScoreController {
 
         return ResponseEntity.ok(responseDto);
     }
+
+    @GetMapping
+    @ApiOperation(value = "가점 계산 결과 조회", notes = "저장된 가점 계산 결과를 반환합니다.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "가점 조회 성공", response = GaScoreDTO.class),
+            @ApiResponse(code = 404, message = "데이터 없음"),
+            @ApiResponse(code = 500, message = "서버 오류")
+    })
+    public ResponseEntity<GaScoreDTO> getGaScore(@ApiParam(hidden = true) HttpServletRequest request) {
+        log.info("GET /v1/ga-score");
+
+        GaScoreDTO responseDto = gaScoreService.getGaScore(request);
+
+        if (responseDto == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(responseDto);
+    }
 }

@@ -5,8 +5,23 @@
 
 <mapper namespace="org.scoula.mapper.GaScoreMapper">
 
-    <!-- 청약 가점 저장 -->
-    <insert id="insertGaScore">
+    <resultMap id="GaScoreResultMap" type="org.scoula.dto.GaScoreDTO">
+        <result property="noHousePeriod" column="no_house_period"/>
+        <result property="dependentsNm" column="dependents_nm"/>
+        <result property="noHouseScore" column="no_house_score"/>
+        <result property="dependentsScore" column="dependents_score"/>
+        <result property="paymentPeriod" column="payment_period"/>
+        <result property="paymentPeriodScore" column="payment_period_score"/>
+        <result property="headOfHousehold" column="head_of_household"/>
+        <result property="houseOwner" column="house_owner"/>
+        <result property="houseDisposal" column="house_disposal"/>
+        <result property="disposalDate" column="disposal_date"/>
+        <result property="maritalStatus" column="marital_status"/>
+        <result property="weddingDate" column="wedding_date"/>
+        <result property="totalGaScore" column="total_ga_score"/>
+    </resultMap>
+
+    <insert id="insertGaScore" parameterType="map">
         INSERT INTO user_info (
             users_idx,
             no_house_period,
@@ -55,4 +70,23 @@
                              total_ga_score       = VALUES(total_ga_score)
     </insert>
 
+    <select id="findGaScoreByUserIdx" parameterType="int" resultMap="GaScoreResultMap">
+        SELECT
+            users_idx,
+            no_house_period,
+            no_house_score,
+            dependents_nm,
+            dependents_score,
+            payment_period,
+            payment_period_score,
+            marital_status,
+            wedding_date,
+            house_disposal,
+            disposal_date,
+            house_owner,
+            head_of_household,
+            total_ga_score
+        FROM user_info
+        WHERE users_idx = #{userIdx}
+    </select>
 </mapper>

@@ -58,5 +58,7 @@ public class UserSelectedController {
         String userId = extractUserIdFromToken(token);
         UserSelectedDTO dto = userSelectedService.getUserSelected(userId);
         return ResponseEntity.ok(dto);
+
     }
+
 }
