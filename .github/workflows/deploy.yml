@@ -29,20 +29,25 @@ jobs:
             echo "$APPLICATION_PROPERTIES" > src/main/resources/application.properties
             echo "$EMAIL_PROPERTIES" > src/main/resources/email.properties
 
-            # 2. 최신 코드 pull 및 빌드
+            # 2. 최신 코드 pull
             git pull origin main
+
+            # 3. gradlew 줄바꿈 문제 해결 및 실행 권한 부여
+            dos2unix gradlew
             chmod +x ./gradlew
+
+            # 4. 빌드 수행
             ./gradlew clean build
 
-            # 3. 톰캣 정지
+            # 5. 톰캣 정지
             sudo systemctl stop tomcat9
 
-            # 4. 기존 배포 제거
+            # 6. 기존 배포 제거
             sudo rm -f /var/lib/tomcat9/webapps/ROOT.war
             sudo rm -rf /var/lib/tomcat9/webapps/ROOT/
 
-            # 5. 새 WAR 파일 배포 (최신 빌드)
+            # 7. 새 WAR 배포
             sudo cp build/libs/*.war /var/lib/tomcat9/webapps/ROOT.war
 
-            # 6. 톰캣 재시작
+            # 8. 톰캣 재시작
             sudo systemctl start tomcat9
