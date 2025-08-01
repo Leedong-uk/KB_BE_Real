@@ -1,0 +1,47 @@
+name: Deploy To Ec2 (Spring MVC WAR)
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH로 EC2 접속하여 Spring MVC WAR 배포
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          APPLICATION_PROPERTIES: ${{ secrets.APPLICATION_PROPERTIES }}
+          EMAIL_PROPERTIES: ${{ secrets.EMAIL_PROPERTIES }}
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          envs: APPLICATION_PROPERTIES,EMAIL_PROPERTIES
+          script_stop: true
+          script: |
+            cd /home/ubuntu/KB_BE_Real
+
+            # 1. 설정파일 교체
+            rm -f src/main/resources/application.properties
+            rm -f src/main/resources/email.properties
+            echo "$APPLICATION_PROPERTIES" > src/main/resources/application.properties
+            echo "$EMAIL_PROPERTIES" > src/main/resources/email.properties
+
+            # 2. 최신 코드 pull 및 빌드
+            git pull origin main
+            ./gradlew clean build
+
+            # 3. 톰캣 정지
+            sudo systemctl stop tomcat9
+
+            # 4. 기존 배포 제거
+            sudo rm -f /var/lib/tomcat9/webapps/ROOT.war
+            sudo rm -rf /var/lib/tomcat9/webapps/ROOT/
+
+            # 5. 새 WAR 파일 배포 (최신 빌드)
+            sudo cp build/libs/*.war /var/lib/tomcat9/webapps/ROOT.war
+
+            # 6. 톰캣 재시작
+            sudo systemctl start tomcat9
